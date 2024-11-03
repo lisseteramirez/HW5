@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   LISSETE RAMIREZ / SECTION 002
  *
  *   Note, additional comments provided throughout source code is
  *   for educational purposes.
@@ -14,63 +14,61 @@ import java.util.Set;
 import java.security.SecureRandom;
 import java.lang.Math;
 
-
 /**
  * Bloom Filters
  *
- * A Bloom filter is an implementation of a set which allows a certain 
- * probability of 'false positives' when determining if a given object is 
- * a member of that set, in return for a reduction in the amount of memory 
+ * A Bloom filter is an implementation of a set which allows a certain
+ * probability of 'false positives' when determining if a given object is
+ * a member of that set, in return for a reduction in the amount of memory
  * required for the set. It effectively works as follows:
  *    1) We allocate 'm' bits to represent the set data.
- *    2) We provide a hash function, which, instead of a single hash code, 
-         produces'k' hash codes and sets those bits.
- *    3) To add an element to the set, we derive bit indexes from all 'k' 
-         hash codes and set those bits.
- *    4) To determine if an element is in the set, we again calculate the 
- *       corresponding hash codes and bit indexes, and say it is likely 
+ *    2) We provide a hash function, which, instead of a single hash code,
+ produces'k' hash codes and sets those bits.
+ *    3) To add an element to the set, we derive bit indexes from all 'k'
+ hash codes and set those bits.
+ *    4) To determine if an element is in the set, we again calculate the
+ *       corresponding hash codes and bit indexes, and say it is likely
  *       present if and only if all corresponding bits are set.
  *
- * The margin of error (or false positive rate) thus comes from the fact 
+ * The margin of error (or false positive rate) thus comes from the fact
  * that as we add more and more objects to the set, we increase the likelihood
- * of "accidentally" setting a combination of bits that corresponds to an 
- * element that isn't actually in the set. However, through tuning the bloom 
- * filter setup based on the expected data, we mathematically have control 
+ * of "accidentally" setting a combination of bits that corresponds to an
+ * element that isn't actually in the set. However, through tuning the bloom
+ * filter setup based on the expected data, we mathematically have control
  * over the desired false positive probability rate that we want to received
  * based on probability theory.
  *
  * False Positive rate discussion:
  *
- * The Bloom filter performance changes as we change parameters discussed 
- * below with the class constructors. There are two key variables that impact 
+ * The Bloom filter performance changes as we change parameters discussed
+ * below with the class constructors. There are two key variables that impact
  * the false positive rate:
  *     1) number of bits per item
  *     2) number of hash codes
  *
- * In other words, how many more bits are there in the filter than the 
- * maximum number of items we want to represent in the set, and hence the 
- * number of bits that we actually set for each element that we add to the 
- * set. The more bits we require to be marked as set to '1' in order to mark 
- * an element as 'present' - e.g., the more hash code per item - the lower the 
+ * In other words, how many more bits are there in the filter than the
+ * maximum number of items we want to represent in the set, and hence the
+ * number of bits that we actually set for each element that we add to the
+ * set. The more bits we require to be marked as set to '1' in order to mark
+ * an element as 'present' - e.g., the more hash code per item - the lower the
  * chance of false positives, because for a given element potentially in
- * the set, there's less chance of some random combination of bits from other 
+ * the set, there's less chance of some random combination of bits from other
  * elements also accidentally marking that element as present when it isn't.
  *
- * But, for a given bit filter size, there is a 'point of no return', at 
- * which having more hash codes simply means that we fill up the bit set too 
- * quickly as we add elements -- and hence get more false positives -- than 
+ * But, for a given bit filter size, there is a 'point of no return', at
+ * which having more hash codes simply means that we fill up the bit set too
+ * quickly as we add elements -- and hence get more false positives -- than
  * with fewer hash codes.
  *
- * Based on this discussion, you can find many Bloom Filter calculators 
- * available online to determine how to adjust the variables inorder to 
- * achieve the desired probability of false positive rates that you can 
+ * Based on this discussion, you can find many Bloom Filter calculators
+ * available online to determine how to adjust the variables inorder to
+ * achieve the desired probability of false positive rates that you can
  * tolerate and/or desire for your application, e.g.,:
  *  - https://toolslick.com/programming/data-structure/bloom-filter-calculator
  *  - https://www.engineersedge.com/calculators/bloom_filter_calculator_15596.htm
  *  - https://www.di-mgt.com.au/bloom-calculator.html
  *  - https://programming.guide/bloom-filter-calculator.html
  */
-
 class BloomFilter {
     private static final int MAX_HASHES = 8;
     private static final long[] byteTable;
@@ -95,21 +93,21 @@ class BloomFilter {
      * Additional discussion on hash implementation:
      *
      * Notice that Java's hash table implementation — and hence implementations
-     * of hashCode() — don't require the goals above to be met. Java maps and 
+     * of hashCode() — don't require the goals above to be met. Java maps and
      * sets, rather than storing just the hash code, store the actual key object.
      * This means that implementations of hashCode() generally only need to
      * be "fairly good". It isn't the end of the world if two key objects have
      * the same hash function, because the keys themselves are also compared in
      * deciding if a match has been found.
      *
-     * Below implements a 64-bit Linear Congruential Generator (LCG). It uses 
-     * a table of 256 random values indexed by successive bytes in the data, 
+     * Below implements a 64-bit Linear Congruential Generator (LCG). It uses
+     * a table of 256 random values indexed by successive bytes in the data,
      * and recommends a multiple suitable for an LCG with a modulus of 2^64,
      * which is effectively what we have when we multiple using 64-bit long.
      *
-     * The value of HMULT is found to be a good practice with 64-bit LCG. It 
-     * has roughly half of its bits set and is 'virtually' prime (it is 
-     * composed of three prime factors). The value of HSTART is arbitrary, 
+     * The value of HMULT is found to be a good practice with 64-bit LCG. It
+     * has roughly half of its bits set and is 'virtually' prime (it is
+     * composed of three prime factors). The value of HSTART is arbitrary,
      * essentially any value would do.
      *
      * Fore more information:
@@ -125,7 +123,6 @@ class BloomFilter {
             byteTable[i] = h;
         }
     }
-
     private long hashCode(String s, int hcNo) {
         long h = HSTART;
         final long hmult = HMULT;
@@ -138,11 +135,9 @@ class BloomFilter {
         }
         return h;
     }
-
     private final BitSet data;          // The hash bit map
     private final int noHashes;         // number of hashes
     private final int hashMask;         // hash mask
-
 
     /*
      * Constructors discussion:
@@ -159,7 +154,6 @@ class BloomFilter {
      *      in effect calculates the required value from a maximum number of
      *      items and a number of bits per item.
      */
-
     public BloomFilter(int log2noBits, int noHashes) {
         if (log2noBits < 1 || log2noBits > 31)
             throw new IllegalArgumentException("Invalid number of bits");
@@ -170,7 +164,6 @@ class BloomFilter {
         this.noHashes = noHashes;
         this.hashMask = (1 << log2noBits) - 1;
     }
-
     public BloomFilter(int noItems, int bitsPerItem, int noHashes) {
         int bitsRequired = noItems * bitsPerItem;
         if (bitsRequired >= Integer.MAX_VALUE) {
@@ -186,7 +179,6 @@ class BloomFilter {
         this.hashMask = (1 << logBits) - 1;
     }
 
-
     /*
      * Method add
      *
@@ -195,7 +187,6 @@ class BloomFilter {
      *
      * @param String - the value to add the to set
      */
-
     public void add(String s) {
         for (int n = 0; n < noHashes; n++) {
             long hc = hashCode(s, n);
@@ -203,7 +194,6 @@ class BloomFilter {
             data.set(bitNo);
         }
     }
-
 
     /*
      * Method contains
@@ -214,19 +204,18 @@ class BloomFilter {
      *
      * @param boolean - false if not in set, else true for most probably in set
      */
-
     public boolean contains(String s) {
-
-        // ADD YOUR CODE HERE - DO NOT FORGET TO ADD YOUR NAME AT TOP OF FILE
-        //
-        // HINT: the bitmap is the private class variable 'data', and it is
-        // of type BitSet (Java class BitSet). See Oracle documentation for
-        // this class on available methods. You can also see how method 'add'
-        // in this class uses the object.
-
-        return false;
+        //loops through each of the hash functions (depending on number hashes specified by noHashes)
+        for (int i = 0; i < noHashes; i++) {
+            //gets the bit index for the current hash
+            int bitIndex = (int) (hashCode(s, i) & hashMask);
+            //if any bit is not set, then the element is not in the set
+            if (!data.get(bitIndex)) {
+                return false;
+            }
+        }
+        return true; //if all bits are set, the element should be in the set
     }
-
 
     /*********************************
      *
@@ -236,7 +225,6 @@ class BloomFilter {
      * It generates random strings for entering into our Bloom filter hash map.
      *
      *********************************/
-
     public static final String LETTERS =
             "abcdefghijklmnopqrstuvexyABCDEFGHIJKLMNOPQRSTUVWYXZzéèêàôû";
     public static String randomString(Random r) {
