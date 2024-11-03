@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   LISSETE RAMIREZ / SECTION 002
  *
  *   This java file contains the problem solutions of isSubSet, findKthLargest,
  *   and sort2Arrays methods. You should utilize the Java Collection Framework for
@@ -9,7 +9,6 @@
  ********************************************************************/
 
 import java.util.*;
-
 class ProblemSolutions {
 
     /**
@@ -29,14 +28,20 @@ class ProblemSolutions {
      * @param list2 - input array B
      * @return      - returns boolean value B is a subset of A.
      */
-
     public boolean isSubset(int list1[], int list2[]) {
-
-        // ADD YOU CODE HERE -- DON'T FORGET TO ADD YOR NAME AT TOP OF FILE
-
-        return false;
+        //HashSet is created to store the elements of list1
+        Set<Integer> set = new HashSet<>();
+        for (int num: list1) {
+            set.add(num); //adds each element of list1 to the set
+        }
+        //checks if every element from list2 is in the set
+        for (int num : list2) {
+            if (!set.contains(num)) {//if elements from list2 are missing in the set
+                return false; //then list2 is not a subset of list1
+            }
+        }
+        return true;//will return true if all elements in list2 are in list1
     }
-
 
     /**
      * Method: findKthLargest
@@ -50,14 +55,17 @@ class ProblemSolutions {
      * @param k     - the kth maximum element
      * @return      - the value in the array which is the kth maximum value
      */
-
     public int findKthLargest(int[] array, int k) {
-
-        // ADD YOUR CODE HERE
-
-        return 0;
+        //A min-heap is created to store the k largest elements
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>(k);
+        for (int num : array) {
+            minHeap.offer(num); // each element from the array is added to the heap
+            if (minHeap.size() > k) {
+                minHeap.poll(); //if the heap size exceed k then the smallest elements are removed
+            }
+        } //the root of the min-heap contains the k's largest element
+        return minHeap.peek();
     }
-
 
     /**
      * Method: sort2Arrays
@@ -71,12 +79,14 @@ class ProblemSolutions {
      * @param array2    - Input array 2
      * @return          - Sorted array with all elements in A and B.
      */
-
     public int[] sort2Arrays(int[] array1, int[] array2) {
-
-        // ADD YOU CODE HERE
-
-        return null;
+        //new array is created to hold all elements from array1 and array2
+        int[] merged = new int[array1.length + array2.length];
+        //copies elements from array1 and array2 into the merged array
+        System.arraycopy(array1, 0, merged, 0, array1.length);
+        System.arraycopy(array2, 0, merged, array1.length, array2.length);
+        //the merged array is sorted to get all elements in sorted order
+        Arrays.sort(merged);
+        return merged;
+        }
     }
-
-}
